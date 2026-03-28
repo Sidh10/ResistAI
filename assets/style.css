@@ -1,0 +1,227 @@
+/* ═══════════════════════════════════════════════════════════
+   ResistAI — Brand-Guided Clinical Dashboard Stylesheet
+   Colors: #C0392B (primary red), #2E86AB (secondary blue), 
+           #F7F9FC (background), #1A1A2E (text)
+   Typography: Inter (headings/body), JetBrains Mono (data)
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Global Styles ─────────────────────────────────────── */
+
+.stApp {
+    background-color: #F7F9FC !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    color: #1A1A2E !important;
+}
+
+h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    color: #1A1A2E !important;
+}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+
+section[data-testid="stSidebar"] {
+    background-color: #1A1A2E !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] .stSelectbox label,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+    color: #F7F9FC !important;
+}
+
+section[data-testid="stSidebar"] .stSelectbox > div > div {
+    background-color: #2a2a4a !important;
+    border-color: #3a3a5a !important;
+    color: #F7F9FC !important;
+    border-radius: 8px !important;
+}
+
+section[data-testid="stSidebar"] .stSlider label {
+    color: #F7F9FC !important;
+}
+
+/* ── Cards ─────────────────────────────────────────────── */
+
+div[data-testid="stMetric"] {
+    background-color: white !important;
+    padding: 16px 20px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+div[data-testid="stMetric"] label {
+    color: #6b7280 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 600 !important;
+    color: #1A1A2E !important;
+}
+
+/* ── DataFrames & Tables ───────────────────────────────── */
+
+.stDataFrame, .stTable {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+.stDataFrame th {
+    background-color: #2E86AB !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+
+.stButton > button {
+    background-color: #C0392B !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 0.6rem 2rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.stButton > button:hover {
+    background-color: #A93226 !important;
+    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ── Tabs ──────────────────────────────────────────────── */
+
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px 8px 0 0 !important;
+    padding: 8px 20px !important;
+    font-weight: 600 !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #2E86AB !important;
+    color: white !important;
+}
+
+/* ── Status Badges ─────────────────────────────────────── */
+
+.resistant-badge {
+    background-color: #E74C3C;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.intermediate-badge {
+    background-color: #F39C12;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.susceptible-badge {
+    background-color: #27AE60;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+/* ── Charts ────────────────────────────────────────────── */
+
+.stPlotlyChart, .stPyplotChart {
+    background-color: white !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── Alert Box ─────────────────────────────────────────── */
+
+.recommendation-box {
+    background: linear-gradient(135deg, #E8F4FD 0%, #d4edfc 100%);
+    border-left: 4px solid #2E86AB;
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+}
+
+.warning-box {
+    background: linear-gradient(135deg, #FFF3CD 0%, #FDE68A 100%);
+    border-left: 4px solid #F39C12;
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+}
+
+.danger-box {
+    background: linear-gradient(135deg, #FDEDEC 0%, #FADBD8 100%);
+    border-left: 4px solid #E74C3C;
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+}
+
+/* ── Expander ──────────────────────────────────────────── */
+
+.streamlit-expanderHeader {
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    color: #1A1A2E !important;
+}
+
+/* ── Progress Bar Colors ───────────────────────────────── */
+
+.stProgress > div > div > div > div {
+    background-color: #2E86AB !important;
+}
+
+/* ── Dividers ──────────────────────────────────────────── */
+
+hr {
+    border-color: #E5E7EB !important;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F7F9FC;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #C4C4C4;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}

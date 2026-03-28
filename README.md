@@ -1,14 +1,14 @@
-# 🧬 ResistAI
+#  ResistAI
 
 **Predict resistance. Prescribe with confidence.**
 
 ResistAI is a clinical decision-support tool that predicts multi-drug antibiotic resistance patterns for bacterial isolates and recommends the most effective antibiotic — with SHAP-based explainability showing which features drove the prediction.
 
-## 🎯 Problem
+##  Problem
 
 Clinicians must wait 48–72 hours for lab cultures to confirm antibiotic effectiveness. ResistAI predicts resistance instantly from known isolate data so treatment decisions don't have to wait.
 
-## ✨ Features
+##  Features
 
 | Feature | Description |
 |---------|-------------|
@@ -16,9 +16,9 @@ Clinicians must wait 48–72 hours for lab cultures to confirm antibiotic effect
 | **SHAP Feature Importance** | Per-prediction waterfall charts showing which features drive each resistance call |
 | **CARD Gene Annotations** | Maps top SHAP features to known resistance genes from the CARD database |
 | **Antibiotic Recommender** | Ranks antibiotics by predicted susceptibility, recommends the best option |
-| **Clinical Dashboard** | Streamlit interface with color-coded resistance status (🔴🟡🟢) |
+| **Clinical Dashboard** | Streamlit interface with color-coded resistance status  |
 
-## 📊 Model Performance
+##  Model Performance
 
 | Metric | Score |
 |--------|-------|
@@ -36,7 +36,7 @@ Clinicians must wait 48–72 hours for lab cultures to confirm antibiotic effect
 > are used. Balanced antibiotics like Amoxicillin-Ampicillin achieve F1 ~0.75, while imbalanced
 > ones (e.g., Colistin at 12% R) are harder to predict.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 # 1. Clone the repo
@@ -56,7 +56,7 @@ python scripts/train_model.py
 streamlit run app.py
 ```
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```
 ResistAI/
@@ -81,7 +81,7 @@ ResistAI/
     └── recommender.py             # Antibiotic ranking & recommendation
 ```
 
-## 🎨 Brand Guidelines
+##  Brand Guidelines
 
 - **Primary**: `#C0392B` (deep red — urgency, medicine)
 - **Secondary**: `#2E86AB` (steel blue — trust, science)
@@ -91,7 +91,7 @@ ResistAI/
 - **Warning**: `#F39C12` (intermediate)
 - **Safe**: `#27AE60` (susceptible)
 
-## 🔬 Key Feature Importance Findings
+##  Key Feature Importance Findings
 
 The SHAP analysis reveals:
 - **Cross-resistance patterns** between related antibiotic classes are the strongest predictors
@@ -99,10 +99,10 @@ The SHAP analysis reveals:
 - **Kaggle enrichment features** (population-level resistance rates) improve prediction confidence
 - **MDR flag** and resistance count are strong signals for pan-resistant profiles
 
-## ⚠️ Disclaimer
+##  Disclaimer
 
 ResistAI is a clinical decision-support tool only. It is **not** a replacement for laboratory culture and sensitivity testing. Always confirm predictions with standard microbiological methods.
 
-## 📄 License
+##  License
 
 MIT License

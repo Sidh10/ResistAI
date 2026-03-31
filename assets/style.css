@@ -51,6 +51,15 @@ section[data-testid="stSidebar"] .stSlider label {
 
 /* ── Cards ─────────────────────────────────────────────── */
 
+.resistance-card {
+    transition: all 0.2s ease !important;
+}
+
+.resistance-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+}
+
 div[data-testid="stMetric"] {
     background-color: white !important;
     padding: 16px 20px !important;

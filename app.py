@@ -120,53 +120,54 @@ with st.sidebar:
         """)
     
     st.markdown("---")
-    st.markdown("### 🏥 Patient & Isolate Info")
     
-    organism = st.selectbox("**Organism**", ORGANISMS, index=0)
-    organism_encoded = ORGANISMS.index(organism)
-    
-    col_a, col_b = st.columns(2)
-    with col_a:
-        age = st.number_input("**Age**", min_value=0, max_value=120, value=55, step=1)
-    with col_b:
-        gender = st.selectbox("**Gender**", GENDERS)
-    gender_encoded = GENDERS.index(gender)
-    
-    st.markdown("---")
-    st.markdown("### 📋 Clinical History")
-    
-    col_c, col_d = st.columns(2)
-    with col_c:
-        diabetes = st.selectbox("**Diabetes**", YES_NO, index=0)
-        diabetes_flag = 1 if diabetes == "Yes" else 0
-    with col_d:
-        hypertension = st.selectbox("**Hypertension**", YES_NO, index=0)
-        hypertension_flag = 1 if hypertension == "Yes" else 0
-    
-    col_e, col_f = st.columns(2)
-    with col_e:
-        hospital_before = st.selectbox("**Prior Hospitalization**", YES_NO, index=0)
-        hospital_flag = 1 if hospital_before == "Yes" else 0
-    with col_f:
-        infection_freq = st.number_input("**Infection Frequency**", min_value=0, max_value=10, value=0, step=1)
+    with st.expander("🏥 **Patient & Isolate Info**", expanded=True):
+        organism = st.selectbox("**Organism**", ORGANISMS, index=0)
+        organism_encoded = ORGANISMS.index(organism)
+        
+        col_a, col_b = st.columns(2)
+        with col_a:
+            age = st.number_input("**Age**", min_value=0, max_value=120, value=55, step=1)
+        with col_b:
+            gender = st.selectbox("**Gender**", GENDERS)
+        gender_encoded = GENDERS.index(gender)
     
     st.markdown("---")
-    st.markdown("### 🧪 Known AST Results")
-    st.markdown(
-        '<p style="color: #8899aa; font-size: 0.8rem;">Set known susceptibility values. '
-        'Leave as "Unknown" if not tested.</p>',
-        unsafe_allow_html=True
-    )
     
-    ast_results = {}
-    for abx in ANTIBIOTIC_NAMES:
-        val = st.selectbox(
-            f"**{abx}**",
-            list(RESISTANCE_OPTIONS.keys()),
-            index=3,  # Default to Unknown
-            key=f"ast_{abx}"
+    with st.expander("📋 **Clinical History**", expanded=False):
+        col_c, col_d = st.columns(2)
+        with col_c:
+            diabetes = st.selectbox("**Diabetes**", YES_NO, index=0)
+            diabetes_flag = 1 if diabetes == "Yes" else 0
+        with col_d:
+            hypertension = st.selectbox("**Hypertension**", YES_NO, index=0)
+            hypertension_flag = 1 if hypertension == "Yes" else 0
+        
+        col_e, col_f = st.columns(2)
+        with col_e:
+            hospital_before = st.selectbox("**Prior Hospitalization**", YES_NO, index=0)
+            hospital_flag = 1 if hospital_before == "Yes" else 0
+        with col_f:
+            infection_freq = st.number_input("**Infection Frequency**", min_value=0, max_value=10, value=0, step=1)
+    
+    st.markdown("---")
+    
+    with st.expander("🧪 **Known AST Results**", expanded=False):
+        st.markdown(
+            '<p style="color: #8899aa; font-size: 0.8rem;">Set known susceptibility values. '
+            'Leave as "Unknown" if not tested.</p>',
+            unsafe_allow_html=True
         )
-        ast_results[abx] = RESISTANCE_OPTIONS[val]
+        
+        ast_results = {}
+        for abx in ANTIBIOTIC_NAMES:
+            val = st.selectbox(
+                f"**{abx}**",
+                list(RESISTANCE_OPTIONS.keys()),
+                index=3,  # Default to Unknown
+                key=f"ast_{abx}"
+            )
+            ast_results[abx] = RESISTANCE_OPTIONS[val]
     
     st.markdown("---")
     predict_clicked = st.button("🔬 **Predict Resistance**", use_container_width=True)
@@ -303,6 +304,14 @@ if predict_clicked:
             st.markdown(f'<div class="danger-box">{w}</div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div class="warning-box">{w}</div>', unsafe_allow_html=True)
+            
+    r_count = sum(1 for p in predictions.values() if p["label"] == "Resistant")
+    if r_count >= 8:
+        st.error("⚠️ **High Resistance Profile**")
+    elif r_count >= 4:
+        st.warning("⚠️ **Moderate Resistance Profile**")
+    else:
+        st.success("✅ **Low Resistance Profile**")
     
     col1, col2, col3 = st.columns([1.2, 1.3, 1])
     
@@ -324,7 +333,7 @@ if predict_clicked:
             abx_class = ANTIBIOTIC_CLASSES.get(abx, "")
             
             st.markdown(f"""
-            <div style="display: flex; align-items: center; justify-content: space-between; 
+            <div class="resistance-card" style="display: flex; align-items: center; justify-content: space-between; 
                         padding: 8px 14px; margin: 4px 0; border-radius: 8px; 
                         background-color: {bg}; border-left: 4px solid {color};">
                 <div>
@@ -491,6 +500,27 @@ if predict_clicked:
                 </span>
             </div>
             """, unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        csv_data = [
+            {"Organism": organism, "Age": age, "Gender": gender, "Diabetes": diabetes,
+             "Hypertension": hypertension, "Prior Hospitalization": hospital_before,
+             "Infection Frequency": infection_freq}
+        ]
+        row = csv_data[0]
+        for abx in ANTIBIOTIC_NAMES:
+            row[f"{abx} Prediction"] = predictions[abx]["label"]
+            row[f"{abx} Probability"] = f"{predictions[abx]['probability']:.2f}"
+            row[f"{abx} Source"] = predictions[abx]["source"]
+        row["Recommended Antibiotic"] = primary["antibiotic"] if primary else "None"
+        import datetime
+        row["Timestamp"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        csv_df = pd.DataFrame(csv_data)
+        csv_string = csv_df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Download Report", data=csv_string,
+                           file_name="resistai_report.csv", mime="text/csv")
     
     # ── Global Feature Importance (below the 3 columns) ──
     st.markdown("---")
@@ -508,36 +538,24 @@ if predict_clicked:
 else:
     # ── Landing state — no prediction yet ──
     st.markdown("""
-    <div style="text-align: center; padding: 60px 20px;">
-        <h2 style="color: #2E86AB; font-size: 1.6rem;">Welcome to ResistAI</h2>
-        <p style="color: #6b7280; font-size: 1.05rem; max-width: 600px; margin: 8px auto 24px;">
-            Enter a bacterial isolate's details and known susceptibility test results 
-            in the sidebar, then click <strong>🔬 Predict Resistance</strong>.
+    <div style="text-align: center; padding: 40px 20px; background: #16213E; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="font-size: 4rem; margin-bottom: 16px;">🧬</div>
+        <h2 style="color: #F7F9FC; font-size: 2.2rem; margin-top: 0;">Predict antibiotic resistance in seconds</h2>
+        <p style="color: #A0AEC0; font-size: 1.1rem; margin-bottom: 30px;">
+            Fill in the patient profile → click Predict Resistance
         </p>
-        <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
-            <div style="background: white; padding: 24px; border-radius: 8px; width: 200px;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 8px;">🧫</div>
-                <h4 style="margin: 0; color: #1A1A2E;">Predict</h4>
-                <p style="color: #888; font-size: 0.82rem; margin: 4px 0 0;">
-                    Multi-label resistance across 16 antibiotics
-                </p>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <div style="background: #1A1A2E; padding: 20px; border-radius: 8px; flex: 1; min-width: 180px;
+                        border: 1px solid #3a3a5a; text-align: center;">
+                <strong style="color: #F7F9FC; font-size: 1.2rem; display: block;">16 Antibiotics</strong>
             </div>
-            <div style="background: white; padding: 24px; border-radius: 8px; width: 200px;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 8px;">📊</div>
-                <h4 style="margin: 0; color: #1A1A2E;">Explain</h4>
-                <p style="color: #888; font-size: 0.82rem; margin: 4px 0 0;">
-                    SHAP charts show which features drive each prediction
-                </p>
+            <div style="background: #1A1A2E; padding: 20px; border-radius: 8px; flex: 1; min-width: 180px;
+                        border: 1px solid #3a3a5a; text-align: center;">
+                <strong style="color: #F7F9FC; font-size: 1.2rem; display: block;">10,984 Training Samples</strong>
             </div>
-            <div style="background: white; padding: 24px; border-radius: 8px; width: 200px;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 8px;">💊</div>
-                <h4 style="margin: 0; color: #1A1A2E;">Recommend</h4>
-                <p style="color: #888; font-size: 0.82rem; margin: 4px 0 0;">
-                    Ranked antibiotics by predicted susceptibility
-                </p>
+            <div style="background: #1A1A2E; padding: 20px; border-radius: 8px; flex: 1; min-width: 180px;
+                        border: 1px solid #3a3a5a; text-align: center;">
+                <strong style="color: #F7F9FC; font-size: 1.2rem; display: block;">SHAP Explainability</strong>
             </div>
         </div>
     </div>

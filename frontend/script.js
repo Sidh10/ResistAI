@@ -31,17 +31,30 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         predictBtn.textContent = "Running...";
+        
+        // Clear any old error
+        const existingErr = document.getElementById("api-error");
+        if (existingErr) existingErr.remove();
+
         try {
             const res = await fetch("http://localhost:8000/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
+            
+            if (!res.ok) {
+                throw new Error(`Server returned ${res.status}`);
+            }
             const data = await res.json();
             renderResults(data);
         } catch (e) {
             console.error(e);
-            alert("API Error: Maybe FastAPI is not running on 8000?");
+            const errDiv = document.createElement("div");
+            errDiv.id = "api-error";
+            errDiv.className = "bg-red-500/20 text-red-100 p-4 rounded-xl mt-4 border border-red-500/50 text-sm";
+            errDiv.textContent = `Error connecting to API: ${e.message}. Is FastAPI running on port 8000?`;
+            document.getElementById("input-form").appendChild(errDiv);
         }
         predictBtn.textContent = "Predict Resistance";
     });
@@ -92,34 +105,52 @@ function renderResults(data) {
 
     const shapCards = document.getElementById("shap-cards");
     if (shapCards) {
-        let shapHtml = '<h2 class="text-primary font-bold text-xs uppercase tracking-[0.15em] mb-6">SHAP Feature Importance</h2><div class="space-y-4 flex-1 flex flex-col justify-center">';
-        data.shap_summary.forEach(s => {
-            const val = s.importance * 100;
-            const isPos = val > 0;
-            const colorHex = isPos ? "#C0392B" : "#2E86AB";
-            const bgWidth = Math.abs(val);
-            const sign = isPos ? "+" : "";
-            
-            let barHtml = "";
-            if (isPos) {
-                barHtml = `<div class="flex-1 bg-surface-variant h-6 rounded-md overflow-hidden flex"><div style="background-color: ${colorHex}; width: ${bgWidth}%" class="h-full"></div></div>`;
-            } else {
-                barHtml = `<div class="flex-1 bg-surface-variant h-6 rounded-md overflow-hidden flex justify-end"><div style="background-color: ${colorHex}; width: ${bgWidth}%" class="h-full"></div><div style="width: ${100-bgWidth}%"></div></div>`;
+        shapCards.innerHTML = '<h2 class="text-primary font-bold text-xs uppercase tracking-[0.15em] mb-6">SHAP Feature Importance</h2><div class="relative w-full h-full min-h-[250px] flex-1"><canvas id="shap-chart"></canvas></div><p class="text-[0.6875rem] text-[#9190A5] italic mt-6 leading-relaxed">Explanation models provide insight into clinical factors driving the resistance score.</p>';
+        const ctx = document.getElementById('shap-chart').getContext('2d');
+        
+        const labels = data.shap_summary.map(s => s.feature);
+        const values = data.shap_summary.map(s => s.importance);
+        const backgroundColors = values.map(v => v > 0 ? '#C0392B' : '#2E86AB');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'SHAP Value (Impact on Model Output)',
+                    data: values,
+                    backgroundColor: backgroundColors,
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let val = context.raw;
+                                return 'Impact: ' + (val > 0 ? '+' : '') + (val*100).toFixed(1) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#333348', drawBorder: false },
+                        ticks: { color: '#9190A5' }
+                    },
+                    y: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { color: '#e2e0fc', font: { family: 'Inter', size: 12 } }
+                    }
+                }
             }
-            
-            shapHtml += `
-            <div class="space-y-1">
-                <div class="flex justify-between text-xs">
-                    <span class="text-[#9190A5]">${s.feature}</span>
-                    <span style="color: ${colorHex}" class="font-bold">${sign}${val.toFixed(1)}%</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    ${barHtml}
-                </div>
-            </div>`;
         });
-        shapHtml += `</div><p class="text-[0.6875rem] text-[#9190A5] italic mt-6 leading-relaxed">Explanation models provide insight into clinical factors driving the resistance score.</p>`;
-        shapCards.innerHTML = shapHtml;
     }
 
     const rankingCards = document.getElementById("ranking-cards");
@@ -145,9 +176,14 @@ function renderResults(data) {
                 const val = (r.susceptibility_score*100).toFixed(0);
                 const colorHex = r.status === "Susceptible" ? "#27AE60" : "#D4AC0D";
                 secondaryHtml += `
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-medium">${r.antibiotic}</span>
-                        <span style="color: ${colorHex}; border: 1px solid ${colorHex}" class="text-[0.6875rem] px-2 py-0.5 rounded font-bold">${val}%</span>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-medium">${r.antibiotic}</span>
+                            <span style="color: ${colorHex};" class="text-[0.6875rem] font-bold">${val}%</span>
+                        </div>
+                        <div class="w-full bg-[#1A1A2E] h-1.5 rounded-full">
+                            <div style="background-color: ${colorHex}; width: ${val}%" class="h-1.5 rounded-full"></div>
+                        </div>
                     </div>
                 `;
             });

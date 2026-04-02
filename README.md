@@ -36,7 +36,19 @@ Clinicians must wait 48–72 hours for lab cultures to confirm antibiotic effect
 > are used. Balanced antibiotics like Amoxicillin-Ampicillin achieve F1 ~0.75, while imbalanced
 > ones (e.g., Colistin at 12% R) are harder to predict.
 
-##  Quick Start
+## Interfaces
+
+### Primary (Streamlit)
+Live app: https://resistai-s.streamlit.app
+Run locally: streamlit run app.py
+
+### Bonus (FastAPI + HTML)
+A second interface built with FastAPI + custom HTML/CSS frontend.
+Run locally:
+uvicorn app_api:app --port 8000
+Then open http://localhost:8000
+
+## Quick Start
 
 ```bash
 # 1. Clone the repo

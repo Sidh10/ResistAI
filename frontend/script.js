@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (existingErr) existingErr.remove();
 
         try {
-            const res = await fetch("http://localhost:8000/predict", {
+            const res = await fetch("/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)

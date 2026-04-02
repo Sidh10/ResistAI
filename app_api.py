@@ -6,6 +6,8 @@ import joblib
 import os
 import sys
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -21,6 +23,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
+@app.get("/")
+def read_root():
+    return FileResponse("frontend/index.html")
 
 # Load model
 model_path = os.path.join(os.path.dirname(__file__), "models", "best_model.pkl")
